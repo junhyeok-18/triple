@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Point</title>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+</head>
+<body>
+    <h2 th:text="${userName} + ' 포인트 내역'"/>
+    <a th:href="@{'/'}">메인화면</a><br>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>포인트 일련번호</th>
+            <th>포인트</th>
+            <th>사유</th>
+            <th>증감</th>
+            <th>생성일</th>
+            <th>수정일</th>
+        </tr>
+        </thead>
+        <tbody th:each="point : ${pointList}">
+        <tr>
+            <td th:text="${point.pointCode}"/>
+            <td th:text="${point.point}"/>
+            <td th:text="${point.reason}"/>
+            <th:block th:if="${point.updown} == 'U'">
+                <td style="color : blue;">증가</td>
+            </th:block>
+            <th:block th:if="${point.updown} == 'D'">
+                <td style="color : red;">감소</td>
+            </th:block>
+            <td th:text="${point.createdDate}"/>
+            <td th:text="${point.modifiedDate}"/>
+        </tr>
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        function loginUser(obj) {
+            var data = {
+                userId : obj
+            };
+            $.ajax({
+                async: true,
+                type: 'POST',
+                url: '/api/v1/user/login',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data)
+            }).done(function (data) {
+                location.href = '/place';
+            }).fail(function (error) {
+                alert('서버와의 통신이 실패했습니다.\n' + JSON.stringify(error));
+            });
+        }
+
+        function UserPoint(obj) {
+            location.herf = '/point/' + obj;
+        }
+    </script>
+</body>
+</html>

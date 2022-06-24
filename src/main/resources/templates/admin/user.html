@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin User</title>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+</head>
+<body>
+    <h2>사용자 추가</h2>
+    <input type="text" id="userName">
+    <input type="text" id="point" th:value="0" readonly>
+    <button type="button" onclick="AddUser()">생성</button>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>사용자 일련번호</th>
+                <th>사용자 아이디</th>
+                <th>사용자 이름</th>
+                <th>사용자 포인트</th>
+                <th>생성일</th>
+                <th>수정일</th>
+            </tr>
+        </thead>
+        <tbody th:each="user : ${userList}">
+            <tr>
+                <td th:text="${user.userCode}"/>
+                <td th:text="${user.userId}"/>
+                <td th:text="${user.userName}"/>
+                <td th:text="${user.point}"/>
+                <td th:text="${user.createdDate}"/>
+                <td th:text="${user.modifiedDate}"/>
+            </tr>
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        function uuidv4() {
+          return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+          );
+        }
+
+        function AddUser(){
+            var userId = uuidv4();
+            var data = {
+                userId : userId,
+                userName : $('#userName').val(),
+                point : $('#point').val()
+            };
+            $.ajax({
+                async: true,
+                type: 'POST',
+                url: '/api/v1/user',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data)
+            }).done(function (data) {
+                location.href = '/admin/user';
+            }).fail(function (error) {
+                alert('서버와의 통신이 실패했습니다.\n' + JSON.stringify(error));
+            });
+        }
+    </script>
+</body>
+</html>

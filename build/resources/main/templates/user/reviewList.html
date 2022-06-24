@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>ReviewList</title>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+</head>
+<body>
+    <h2>리뷰</h2>
+    <a th:href="@{'/'}">메인화면</a><br>
+    <button type="button" onclick="AddReview()">작성</button>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>리뷰 일련번호</th>
+                <th>리뷰 아이디</th>
+                <th>장소 이름</th>
+                <th>리뷰 내용</th>
+                <th>사용자 이름</th>
+                <th>생성일</th>
+                <th>수정일</th>
+            </tr>
+        </thead>
+        <tbody th:each="review : ${reviewList}" th:with="userId = ${#strings.substring(review.userId, 8, 16)} + '-' +
+                                                                  ${#strings.substring(review.userId, 4, 8)} + '-' +
+                                                                  ${#strings.substring(review.userId, 0, 4)} + '-' +
+                                                                  ${#strings.substring(review.userId, 16, 20)} + '-' +
+                                                                  ${#strings.substring(review.userId, 20)},
+                                                       reviewId = ${#strings.substring(review.reviewId, 8, 16)} + '-' +
+                                                                  ${#strings.substring(review.reviewId, 4, 8)} + '-' +
+                                                                  ${#strings.substring(review.reviewId, 0, 4)} + '-' +
+                                                                  ${#strings.substring(review.reviewId, 16, 20)} + '-' +
+                                                                  ${#strings.substring(review.reviewId, 20)}">
+            <tr>
+                <td th:text="${review.reviewCode}"/>
+                <td th:text="${reviewId}"/>
+                <td th:text="${review.placeName}"/>
+                <th:block th:if="${user.userId == userId}">
+                    <td th:onclick="reviewMod( [[${reviewId}]] )">
+                        <a th:text="${review.content}" style="color : blue; cursor : pointer;"/>
+                    </td>
+                </th:block>
+                <th:block th:unless="${user.userId == userId}">
+                    <td th:text="${review.content}"/>
+                </th:block>
+                <td th:text="${review.userName}"/>
+                <td th:text="${review.createdDate}"/>
+                <td th:text="${review.modifiedDate}"/>
+            </tr>
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        function AddReview() {
+            /*<![CDATA[*/
+                var placeId = '[[${placeId}]]';
+            /*]]>*/
+            location.href = '/reviewAdd/' + placeId;
+        }
+
+        function reviewMod(obj) {
+            location.href = '/reviewMod/' + obj;
+        }
+    </script>
+</body>
+</html>

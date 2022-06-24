@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Place</title>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+</head>
+<body>
+    <h2>장소 선택</h2>
+    <a th:href="@{'/'}">메인화면</a><br>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>장소 일련번호</th>
+                <th>장소 아이디</th>
+                <th>장소 이름</th>
+                <th>생성일</th>
+                <th>수정일</th>
+            </tr>
+        </thead>
+        <tbody th:each="place : ${placeList}">
+            <tr>
+                <td th:text="${place.placeCode}"/>
+                <td th:text="${place.placeId}"/>
+                <td th:onclick="reviewList( [[${place.placeId}]] )">
+                    <a th:text="${place.placeName}" style="color : blue; cursor : pointer;"/>
+                </td>
+                <td th:text="${place.createdDate}"/>
+                <td th:text="${place.modifiedDate}"/>
+            </tr>
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        function reviewList(obj) {
+            location.href = '/reviewList/' + obj;
+        }
+    </script>
+</body>
+</html>

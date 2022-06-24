@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>ReviewAdd</title>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+</head>
+<body>
+    <h2>리뷰 작성</h2>
+    <a th:href="@{'/'}">메인화면</a><br>
+    <input type="text" id="content">
+    <input type="file" id="image" multiple>
+    <button type="button" onclick="AddReview()">저장</button>
+
+    <script type="text/javascript">
+        /*<![CDATA[*/
+            var userId = '[[${user.userId}]]';
+            var placeId = '[[${placeId}]]';
+        /*]]>*/
+
+        function uuidv4() {
+          return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+          );
+        }
+
+        function AddReview() {
+            var attachedPhotoIds = new Array();
+
+            var fileInput = $('#image');
+            for (var i = 0; i < fileInput.length; i++) {
+                if (fileInput[i].files.length > 0) {
+                    for (var j = 0; j < fileInput[i].files.length; j++) {
+                        attachedPhotoIds.push(uuidv4());
+                    }
+                }
+            }
+
+            var data = {
+                type : 'REVIEW',
+                action : 'ADD',
+                reviewId : uuidv4(),
+                content : $('#content').val(),
+                attachedPhotoIds : attachedPhotoIds,
+                userId : userId,
+                placeId : placeId
+            }
+            $.ajax({
+                async: true,
+                type: 'POST',
+                url: '/events',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data)
+            }).done(function (data) {
+                location.href = '/reviewList/' + placeId;
+            }).fail(function (error) {
+                alert('서버와의 통신이 실패했습니다.\n' + JSON.stringify(error));
+            });
+        }
+    </script>
+</body>
+</html>

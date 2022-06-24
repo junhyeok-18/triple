@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>ReviewMod</title>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+</head>
+<body>
+    <h2>리뷰 수정</h2>
+    <a th:href="@{'/'}">메인화면</a><br>
+    <th:block th:each="review : ${reviewInfo}" th:with="placeId = ${#strings.substring(review.placeId, 8, 16)} + '-' +
+                                                                  ${#strings.substring(review.placeId, 4, 8)} + '-' +
+                                                                  ${#strings.substring(review.placeId, 0, 4)} + '-' +
+                                                                  ${#strings.substring(review.placeId, 16, 20)} + '-' +
+                                                                  ${#strings.substring(review.placeId, 20)},
+                                                       reviewId = ${#strings.substring(review.reviewId, 8, 16)} + '-' +
+                                                                  ${#strings.substring(review.reviewId, 4, 8)} + '-' +
+                                                                  ${#strings.substring(review.reviewId, 0, 4)} + '-' +
+                                                                  ${#strings.substring(review.reviewId, 16, 20)} + '-' +
+                                                                  ${#strings.substring(review.reviewId, 20)}">
+        <input type="text" id="content" th:value="${review.content}">
+        <input type="hidden" id="placeId" th:value="${placeId}">
+        <input type="hidden" id="reviewId" th:value="${reviewId}">
+    </th:block>
+    <input type="file" id="image" multiple>
+    <button type="button" onclick="ModReview()">수정</button>
+    <button type="button" onclick="DelReview()">삭제</button>
+
+    <script type="text/javascript">
+        /*<![CDATA[*/
+            var userId = '[[${user.userId}]]';
+        /*]]>*/
+
+        var placeId = $('#placeId').val();
+        var reviewId = $('#reviewId').val();
+
+        function uuidv4() {
+          return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+          );
+        }
+
+        function ModReview() {
+            var attachedPhotoIds = new Array();
+
+            var fileInput = $('#image');
+            for (var i = 0; i < fileInput.length; i++) {
+                if (fileInput[i].files.length > 0) {
+                    for (var j = 0; j < fileInput[i].files.length; j++) {
+                        attachedPhotoIds.push(uuidv4());
+                    }
+                }
+            }
+
+            var data = {
+                type : 'REVIEW',
+                action : 'MOD',
+                reviewId : reviewId,
+                content : $('#content').val(),
+                attachedPhotoIds : attachedPhotoIds,
+                userId : userId,
+                placeId : placeId
+            }
+            $.ajax({
+                async: true,
+                type: 'POST',
+                url: '/events',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data)
+            }).done(function (data) {
+                location.href = '/reviewList/' + placeId;
+            }).fail(function (error) {
+                alert('서버와의 통신이 실패했습니다.\n' + JSON.stringify(error));
+            });
+        }
+
+        function DelReview() {
+            var attachedPhotoIds = new Array();
+
+            var fileInput = $('#image');
+            for (var i = 0; i < fileInput.length; i++) {
+                if (fileInput[i].files.length > 0) {
+                    for (var j = 0; j < fileInput[i].files.length; j++) {
+                        attachedPhotoIds.push(uuidv4());
+                    }
+                }
+            }
+
+            var data = {
+                type : 'REVIEW',
+                action : 'DELETE',
+                reviewId : reviewId,
+                content : $('#content').val(),
+                attachedPhotoIds : attachedPhotoIds,
+                userId : userId,
+                placeId : placeId
+            }
+            $.ajax({
+                async: true,
+                type: 'POST',
+                url: '/events',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data)
+            }).done(function (data) {
+                location.href = '/reviewList/' + placeId;
+            }).fail(function (error) {
+                alert('서버와의 통신이 실패했습니다.\n' + JSON.stringify(error));
+            });
+        }
+    </script>
+</body>
+</html>
